@@ -9,24 +9,16 @@ f: X \to Y; \:
 f(t, \textbf{p}) =\sum_{i=1}^p\lambda_i\alpha_i^t
 $$
 
-где $\textbf{p} = (\lambda_1, \alpha_1, \lambda_2, \alpha_2, \ldots, \lambda_p, \alpha_p)$.
+где $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \alpha_1, \ldots, \alpha_p)$
 
 Предполагая, что $\forall i \:\alpha_i > 0$, можно переписать $f(t, \textbf{p})$ как:
 
 $$
 f(t, \textbf{p})=\sum_{i=1}^p\lambda_i\exp(\ln(\alpha_i)t) =
-\sum_{i=1}^p\lambda_i\exp(\beta_it),
+\sum_{i=1}^p\lambda_i\exp(\omega_it),
 $$
 
-где $\forall i\:\beta_i\in\mathbb{R}$.
-
-Тогда:
-
-$$
-f(t)=\sum_{i=1}^p\lambda_i\exp(-\omega_it),
-$$
-
-где $\textbf{p} = (\lambda_1, \omega_1, \lambda_2, \omega_2, \ldots, \lambda_p, \omega_p)$ — параметры, которые необходимо подобрать.
+где $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \omega_1, \ldots, \omega_p)$ — параметры, которые необходимо подобрать.
 
 Функция потерь для оптимизации — это MSE:
 
@@ -34,7 +26,7 @@ $$
 L(\textbf{p}) = \sum_{i=1}^p(y_i-f(t_i, \textbf{p}))^2.
 $$
 
-Метод оптимизации — алгоритм Левенберга — Марквардта, встроенный в функцию curve fit библиотеки scikit-learn.
+Метод оптимизации — алгоритм Левенберга — Марквардта, встроенный в функцию curve_fit библиотеки scipy.
 
 ## Алгоритм Левенберга — Марквардта (LMA)
 
@@ -57,11 +49,11 @@ $$
 Таким образом $\forall j\le p:$
 
 $$
-\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(-\omega_jx),
+\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(\omega_jx),
 $$
 
 $$
-\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = -\omega_j\exp(-\omega_jx).
+\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = \omega_j\exp(\omega_jx).
 $$
 
 Функция потерь минимизируется, когда её градиент по $\textbf{p}$ равен нулю. Для первого порядка аппроксимации $f\left (t_i,  \mathbf{p} + \boldsymbol\Delta\right )$:

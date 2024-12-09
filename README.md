@@ -17,16 +17,10 @@ Assuming $\forall i \:\alpha_i > 0$ we can rewrite $f(t, \textbf{p})$ as:
 
 $$
 f(t, \textbf{p})=\sum_{i=1}^p\lambda_i\exp(\ln(\alpha_i)t) =
-\sum_{i=1}^p\lambda_i\exp(\beta_it)
+\sum_{i=1}^p\lambda_i\exp(\omega_it)
 $$
 
-Since $\forall i\:\beta_i\in\mathbb{R}$
-
-$$
-f(t)=\sum_{i=1}^p\lambda_i\exp(-\omega_it)
-$$
-
-Finally,$\textbf{p} = (\lambda_1, \ldots, \lambda_p, \omega_1, \ldots, \omega_p)$ – are parameters to fit
+Finally, $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \omega_1, \ldots, \omega_p)$ – are parameters to fit
 
 Loss function to optimize is MSE:
 
@@ -34,7 +28,7 @@ $$
 L(\textbf{p}) = \sum_{i=1}^p(y_i-f(t_i, \textbf{p}))^2
 $$
 
-The method to optimize will be Levenberg-Marquardt algorith used in built-in curve fit optimizer for scikit-learn.
+The method to optimize will be Levenberg-Marquardt algorith used in built-in curve_fit optimizer for scipy.
 
 ## Levenberg-Marquardt algorithm (LMA)
 
@@ -61,11 +55,11 @@ is the gradient of $f$ with respect to $\mathbf{p}$.
 So $\forall j\le p:$
 
 $$
-\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(-\omega_jx),
+\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(\omega_jx),
 $$
 
 $$
-\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = -\omega_j\exp(-\omega_jx).
+\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = \omega_j\exp(\omega_jx).
 $$
 
 The loss function has its minimum at a zero gradient with respect to $\textbf{p}$. The above first-order approximation of $f\left (t_i,  \mathbf{p} + \boldsymbol\Delta\right )$ gives
