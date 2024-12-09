@@ -54,6 +54,16 @@ $$
 
 — это градиент $f$ по параметрам $\mathbf{p}$.
 
+Таким образом $\forall j\le p:$
+
+$$
+\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(-\omega_jx),
+$$
+
+$$
+\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = -\omega_j\exp(-\omega_jx).
+$$
+
 Функция потерь минимизируется, когда её градиент по $\textbf{p}$ равен нулю. Для первого порядка аппроксимации $f\left (t_i,  \mathbf{p} + \boldsymbol\Delta\right )$:
 
 $$

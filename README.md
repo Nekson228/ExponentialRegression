@@ -11,7 +11,7 @@ f: X \to Y; \:
 f(t, \textbf{p}) =\sum_{i=1}^p\lambda_i\alpha_i^t
 $$
 
-Where $\textbf{p} = (\lambda_1, \alpha_1, \lambda_2, \alpha_2, \ldots, \lambda_p, \alpha_p)$
+Where $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \alpha_1, \ldots, \alpha_p)$
 
 Assuming $\forall i \:\alpha_i > 0$ we can rewrite $f(t, \textbf{p})$ as:
 
@@ -26,7 +26,7 @@ $$
 f(t)=\sum_{i=1}^p\lambda_i\exp(-\omega_it)
 $$
 
-Finally, $\textbf{p} = (\lambda_1, \omega_1, \lambda_2, \omega_2, \ldots, \lambda_p, \omega_p)$ - are parameters to fit
+Finally,$\textbf{p} = (\lambda_1, \ldots, \lambda_p, \omega_1, \ldots, \omega_p)$ – are parameters to fit
 
 Loss function to optimize is MSE:
 
@@ -56,7 +56,17 @@ $$
 \mathbf{J}_i = \frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{p}}
 $$
 
-is the gradient of $f$ with respect to $ \mathbf{p}$
+is the gradient of $f$ with respect to $\mathbf{p}$.
+
+So $\forall j\le p:$
+
+$$
+\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(-\omega_jx),
+$$
+
+$$
+\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = -\omega_j\exp(-\omega_jx).
+$$
 
 The loss function has its minimum at a zero gradient with respect to $\textbf{p}$. The above first-order approximation of $f\left (t_i,  \mathbf{p} + \boldsymbol\Delta\right )$ gives
 
