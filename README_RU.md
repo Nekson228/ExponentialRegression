@@ -53,10 +53,10 @@ $$
 $$
 
 $$
-\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = \omega_j\exp(\omega_jx).
+\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = \lambda_jx\exp(\omega_jx).
 $$
 
-Функция потерь минимизируется, когда её градиент по $\textbf{p}$ равен нулю. Для первого порядка аппроксимации $f\left (t_i,  \mathbf{p} + \boldsymbol\Delta\right )$:
+Функция потерь достигает минимума, когда её градиент по $\textbf{p}$ равен нулю. Для первого приближения $f\left (t_i,  \mathbf{p} + \boldsymbol\Delta\right )$:
 
 $$
 L\left ( \mathbf{p} + \boldsymbol\Delta\right ) \approx \sum_{i=1}^p \left [y_i - f\left (t_i,  \mathbf{p}\right ) - \mathbf J_i \boldsymbol\Delta\right ]^2
