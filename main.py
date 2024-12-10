@@ -7,9 +7,6 @@ from sklearn.preprocessing import StandardScaler
 from src.exponential_regression import ExponentialRegression
 from src.loss.chi_squared import ChiSquaredLoss
 
-from scipy.optimize import curve_fit
-
-
 def model(x: np.ndarray, *parameters) -> np.ndarray:
     return np.exp(parameters[2] * x) * parameters[0] + np.exp(parameters[3] * x) * parameters[1]
 
@@ -23,9 +20,6 @@ def main():
 
     scaler = StandardScaler()
     x = scaler.fit_transform(x)
-
-    # cfit = curve_fit(model, x_scaled.ravel(), y, p0=[1, 0], method='lm')
-    # coefficients = cfit[0]
 
     loss = ChiSquaredLoss(measurements, measurement_errors)
 
