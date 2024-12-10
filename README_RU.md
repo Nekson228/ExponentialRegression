@@ -49,11 +49,11 @@ $$
 Таким образом $\forall j\le p:$
 
 $$
-\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(\omega_jx),
+\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(\omega_jt_i),
 $$
 
 $$
-\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = \lambda_jx\exp(\omega_jx).
+\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = \lambda_jt_i\exp(\omega_jt_i).
 $$
 
 Функция потерь достигает минимума, когда её градиент по $\textbf{p}$ равен нулю. Для первого приближения $f\left (t_i,  \mathbf{p} + \boldsymbol\Delta\right )$:

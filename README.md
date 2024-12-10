@@ -2,7 +2,7 @@
 
 ETU 2024 CompMath exponential sum fitting implementation
 
-Given $(X, Y)$, where $X$ is 1-dimensional values and $Y$ is 1-dimensional target.
+Given $(t_i, y_i)_{i=1}^n$, where $X$ is 1-dimensional values and $Y$ is 1-dimensional target.
 
 Consider $p$ is amount of exponential terms so we are going to fit:
 
@@ -25,7 +25,7 @@ Finally, $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \omega_1, \ldots, \omega_p
 Loss function to optimize is MSE:
 
 $$
-L(\textbf{p}) = \sum_{i=1}^p(y_i-f(t_i, \textbf{p}))^2
+L(\textbf{p}) = \sum_{i=1}^n(y_i-f(t_i, \textbf{p}))^2
 $$
 
 The method to optimize will be Levenberg-Marquardt algorith used in built-in curve_fit optimizer for scipy.
@@ -52,14 +52,14 @@ $$
 
 is the gradient of $f$ with respect to $\mathbf{p}$.
 
-So $\forall j\le p:$
+So, for our problem $\forall j\le p:$
 
 $$
-\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(\omega_jx),
+\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(\omega_jt_i),
 $$
 
 $$
-\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = \lambda_jx\exp(\omega_jx).
+\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = \lambda_jt_i\exp(\omega_jt_i).
 $$
 
 The loss function has its minimum at a zero gradient with respect to $\textbf{p}$. The above first-order approximation of $f\left (t_i,  \mathbf{p} + \boldsymbol\Delta\right )$ gives
@@ -86,7 +86,7 @@ Taking the derivative of this approximation of $L\left ( \mathbf{p} + \boldsymbo
  \left (\mathbf J^{\mathrm T} \mathbf J\right )\boldsymbol\Delta = \mathbf J^{\mathrm T}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ],
  $$
 
- The above expression obtained for ⁠$ \mathbf{p}$ comes under the Gauss–Newton method. The Jacobian matrix as defined above is not (in general) a square matrix, but a rectangular matrix of size $m \times n$, where $n$ is the number of parameters (size of the vector $ \mathbf{p}$). The matrix multiplication $\boldsymbol{J}^T\boldsymbol{J}$yields the required $n\times n$
+ The above expression obtained for ⁠$\mathbf{p}$ comes under the Gauss–Newton method. The Jacobian matrix as defined above is not (in general) a square matrix, but a rectangular matrix of size $m \times n$, where $n$ is the number of parameters (size of the vector $\mathbf{p}$). The matrix multiplication $\boldsymbol{J}^T\boldsymbol{J}$yields the required $n\times n$
  square matrix and the matrix-vector product on the right hand side yields a vector of size $n$. The result is a set of $n$ linear equations, which can be solved for ⁠$\boldsymbol{\Delta}$.
 
  Levenberg's contribution is to replace this equation by a "damped version":
@@ -115,3 +115,7 @@ $$
 ### Choice of damping parameter
 
 An effective strategy for the control of the damping parameter, called delayed gratification, consists of increasing the parameter by a small amount for each uphill step, and decreasing by a large amount for each downhill step. The idea behind this strategy is to avoid moving downhill too fast in the beginning of optimization, therefore restricting the steps available in future iterations and therefore slowing down convergence. An increase by a factor of 2 and a decrease by a factor of 3 has been shown to be effective in most cases, while for large problems more extreme values can work better, with an increase by a factor of 1.5 and a decrease by a factor of 5.
+
+## Implementation notes
+
+As performance implementation relied only on theoretical approaches was not good enough to use it as a solution, in resulting implementation few improvements were 
