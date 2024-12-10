@@ -1,6 +1,6 @@
 # Экспоненциальная регрессия
 
-Даны $(X, Y)$, где $X$ — одномерные значения, а $Y$ — одномерная целевая переменная.
+Даны $(t_i, y_i)_{i=1}^n$, где $X$ — одномерные значения, а $Y$ — одномерная целевая переменная.
 
 Рассмотрим $p$ — количество экспоненциальных членов, тогда мы подбираем функцию:
 
@@ -103,3 +103,69 @@ $$
 ### Выбор коэффициента регуляризации
 
 Эффективной стратегией управления $\lambda$ является "отложенное вознаграждение": увеличение $\lambda$ после неудачного шага и снижение после успешного. Например, увеличение в 2 раза и снижение в 3 раза работает в большинстве случаев, для задач с большим числом параметров лучше брать более агрессивные значения, например, увеличение в 1.5 раза и снижение в 5 раз.
+
+## Детали реализации
+
+Так как производительность реализации, основанной исключительно на теоретических выкладках, оказалась недостаточной для практического применения, в итоговом решении были внесены несколько улучшений.
+
+### Функция потерь
+
+Функция потерь была изменена на $\chi^2$, так как она часто используются в задачах аппроксимации кривых. Она определяется следующим образом:
+$$
+\chi^2(\boldsymbol p) = \sum_{i=1}^n\left(\frac{y_i-f(t_i, \boldsymbol p)}{\sigma_i}\right)^2 = \left[\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^T\boldsymbol{W}\left[\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ],
+$$
+где $\boldsymbol{W} = \operatorname{diag}\left(\frac{1}{\sigma_1^2}, \ldots, \frac{1}{\sigma_n^2}\right)$ — матрица весов, зависящих от дисперсий каждого измерения. На практике она используется для увеличения веса измерений с меньшими ошибками.
+
+Формула обновления для $\mathbf{\Delta}$ была скорректирована, чтобы учитывать изменение функции потерь:
+
+$$
+\left (\mathbf J^{\mathrm T} \boldsymbol{W} \mathbf J + \lambda \mathbf{E} \right ) \boldsymbol\Delta = \mathbf J^{\mathrm T}\boldsymbol{W}\left [\mathbf y - \mathbf f\left ( \boldsymbol p\right )\right ].
+$$
+
+### Принятие шага
+
+Ранее шаг принимался, если функция потерь уменьшалась, иначе он отклонялся, а коэффициент регуляризации увеличивался. Теперь шаг принимается, если метрика $\rho$ больше порогового значения $\epsilon_4 > 0$ (`step-acceptance` в коде). Эта метрика измеряет фактическое уменьшение $\chi^2$ по сравнению с улучшением, достигаемым шагом метода Левенберга-Марквардта.
+
+$$
+\begin{align}
+\rho &= \frac{\chi^2(\boldsymbol p) - \chi^2(\boldsymbol p + \boldsymbol\Delta)}
+{|(\boldsymbol{y}-\boldsymbol{\hat{y}})^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}}) - (\boldsymbol{y}-\boldsymbol{\hat{y}}-\mathbf{J\Delta})^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}}-\mathbf{J\Delta})|}\notag\\
+&=\frac{\chi^2(\boldsymbol p) - \chi^2(\boldsymbol p + \boldsymbol\Delta)}
+{|\mathbf{\Delta}^T(\lambda\mathbf{\Delta} + \mathbf{J}^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}}))|}\notag\\
+\end{align}
+$$
+
+где $\boldsymbol{\hat{y}} = \mathbf{f}(\boldsymbol{p})$.
+
+Эта метрика для принятия шага была предложена Нильсеном в его статье 1999 года [3].
+
+Выбранное значение для $\epsilon_4$ — $10^{-1}$.
+
+### Стратегия обновления
+
+Коэффициент регуляризации и параметры модели обновляются согласно следующим правилам:
+
+Если $\rho > \epsilon_4$: $\lambda = \max[\lambda/L_\downarrow,\:10^{-7}],\:\mathbf{p} \leftarrow\mathbf{p} + \mathbf{\Delta}$<br>
+иначе: $\lambda = \min[\lambda L_\uparrow,\:10^{7}]$
+
+где $L_\downarrow\approx9$ и $L_\uparrow\approx11$ — фиксированные константы (`REG_DECREASE_FACTOR` и `REG_INCREASE_FACTOR` в коде). Эти значения были выбраны на основе статьи [2].
+
+### Критерии сходимости
+
+Алгоритм останавливается, когда выполняется *одно* из следующих условий:
+
+- Сходимость по норме градиента: $\operatorname{max}|\mathbf{J}^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}})| < \epsilon_1$ (`gradient_tol` в коде)
+- Сходимость по коэффициентам: $\operatorname{max}|{\mathbf{\Delta}}/\mathbf{p}| < \epsilon_2$ (`coefficients_tol` в коде)
+- Сходимость по (редуцированному) $\chi^2$: $\chi^2_{\nu}=\chi^2/(m-n) < \epsilon_3$ (`chi2_red_tol` в коде)
+
+где $\epsilon_1 = 10^{-3}$, $\epsilon_2 = 10^{-3}$, $\epsilon_3 = 10^{-1}$ — пороговые значения, заданные пользователем.
+
+### Начальное приближение
+
+В задачах нелинейных наименьших квадратов функция потерь $\chi^2(\mathbf{p})$ может иметь множество локальных минимумов. В таких случаях метод Левенберга-Марквардта может сходиться к неудовлетворительному решению. Если это происходит, пользователь может попытаться задать лучшее начальное приближение для параметров, например, с помощью случайного поиска, или поиска по сетке, либо путем анализа данных.
+
+# Источники
+
+1. [Wikipedia contributors. *Levenberg–Marquardt algorithm*. Wikipedia, The Free Encyclopedia.](https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm).
+2. [H.P. Gavin, *The Levenberg-Marquardt algorithm for nonlinear least squares curve-fitting problems*. 2020](https://people.duke.edu/~hpgavin/ce281/lm.pdf).
+3. [H.B. Nielson, *Damping Parameter in Marquardt's method*. 1999](https://www2.imm.dtu.dk/documents/ftp/tr99/tr05_99.pdf).
