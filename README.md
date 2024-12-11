@@ -110,7 +110,7 @@ Taking the derivative of this approximation of $L\left ( \mathbf{p} + \boldsymbo
  \left (\mathbf J^{\mathrm T} \mathbf J\right )\boldsymbol\Delta = \mathbf J^{\mathrm T}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ],
  $$
 
- The above expression obtained for ⁠$\mathbf{p}$ comes under the Gauss–Newton method. The Jacobian matrix as defined above is not (in general) a square matrix, but a rectangular matrix of size $m \times n$, where $n$ is the number of parameters (size of the vector $\mathbf{p}$). The matrix multiplication $\boldsymbol{J}^T\boldsymbol{J}$yields the required $n\times n$
+ The above expression obtained for ⁠$\mathbf{p}$ comes under the Gauss–Newton method. The Jacobian matrix as defined above is not (in general) a square matrix, but a rectangular matrix of size $m \times n$, where $n$ is the number of parameters (size of the vector $\mathbf{p}$). The matrix multiplication $\boldsymbol{J}^T\boldsymbol{J}$ yields the required $n\times n$
  square matrix and the matrix-vector product on the right hand side yields a vector of size $n$. The result is a set of $n$ linear equations, which can be solved for ⁠$\boldsymbol{\Delta}$.
 
  Levenberg's contribution is to replace this equation by a "damped version":
@@ -151,7 +151,7 @@ It is defined as:
 $$
 \chi^2(\boldsymbol p) = \sum_{i=1}^n\left(\frac{y_i-f(t_i, \boldsymbol p)}{\sigma_i}\right)^2 = \left[\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^T\boldsymbol{W}\left[\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ],
 $$
-where $\boldsymbol{W} = \operatorname{diag}\left(\frac{1}{\sigma_1^2}, \ldots, \frac{1}{\sigma_n^2}\right)$ is a weight matrix of variances of each measurement. In practice, it is used to give more weight to the measurements with smaller errors. 
+where $\boldsymbol{W} = \operatorname{diag}\left(\frac{1}{\sigma_1^2}, \ldots, \frac{1}{\sigma_n^2}\right)$ is a weight matrix: $\sigma_i^2=\mathbb{D}[y_i]$. In practice, it is used to give more weight to the measurements with smaller errors. 
 
 The update formula for $\mathbf{\Delta}$ is adjusted accordingly to reflect the change in loss function::
 

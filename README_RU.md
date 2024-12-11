@@ -1,4 +1,4 @@
-# Экспоненциальная регрессия
+# Постановка задачи
 
 Даны $(t_i, y_i)_{i=1}^n$, где $X$ — одномерные значения, а $Y$ — одномерная целевая переменная.
 
@@ -114,7 +114,7 @@ $$
 $$
 \chi^2(\boldsymbol p) = \sum_{i=1}^n\left(\frac{y_i-f(t_i, \boldsymbol p)}{\sigma_i}\right)^2 = \left[\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^T\boldsymbol{W}\left[\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ],
 $$
-где $\boldsymbol{W} = \operatorname{diag}\left(\frac{1}{\sigma_1^2}, \ldots, \frac{1}{\sigma_n^2}\right)$ — матрица весов, зависящих от дисперсий каждого измерения. На практике она используется для увеличения веса измерений с меньшими ошибками.
+где $\boldsymbol{W} = \operatorname{diag}\left(\frac{1}{\sigma_1^2}, \ldots, \frac{1}{\sigma_n^2}\right)$ — матрица весов: $\sigma_i^2=\mathbb{D}[y_i]$. На практике она используется для увеличения веса измерений с меньшими ошибками.
 
 Формула обновления для $\mathbf{\Delta}$ была скорректирована, чтобы учитывать изменение функции потерь:
 
