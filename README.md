@@ -1,4 +1,28 @@
-# Exponential Regression
+# Table of Contents
+
+- [Table of Contents](#table-of-contents)
+- [Usage](#usage)
+- [Problem](#problem)
+  - [Levenberg-Marquardt algorithm (*LMA*)](#levenberg-marquardt-algorithm-lma)
+    - [Choice of damping parameter](#choice-of-damping-parameter)
+  - [Implementation details](#implementation-details)
+    - [Loss function](#loss-function)
+    - [Step acceptance](#step-acceptance)
+    - [Update strategy](#update-strategy)
+    - [Convergence criteria](#convergence-criteria)
+    - [Initial guess](#initial-guess)
+- [References](#references)
+
+# Usage 
+
+1. Install requirements:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+2. Run `main.py` or go through the notebook `demo.ipynb` to see the example of usage.
+
+# Problem
 
 ETU 2024 CompMath exponential sum fitting implementation
 
@@ -30,7 +54,7 @@ $$
 
 The method to optimize will be Levenberg-Marquardt algorith used in built-in curve_fit optimizer for scipy.
 
-## Levenberg-Marquardt algorithm (LMA)
+## Levenberg-Marquardt algorithm (*LMA*)
 
 Like other numeric minimization algorithms, the Levenberg–Marquardt algorithm is an iterative procedure.
 To start a minimization, the user has to provide an initial guess for the parameter vector $\textbf{p}^T=\begin{pmatrix}1, 1, \dots, 1\end{pmatrix}$ will work fine;
@@ -114,7 +138,7 @@ $$
 
 ### Choice of damping parameter
 
-An effective strategy for the control of the damping parameter, called delayed gratification, consists of increasing the parameter by a small amount for each uphill step, and decreasing by a large amount for each downhill step. The idea behind this strategy is to avoid moving downhill too fast in the beginning of optimization, therefore restricting the steps available in future iterations and therefore slowing down convergence. An increase by a factor of 2 and a decrease by a factor of 3 has been shown to be effective in most cases, while for large problems more extreme values can work better, with an increase by a factor of 1.5 and a decrease by a factor of 5.
+An effective strategy for the control of the damping parameter, called delayed gratification, consists of increasing the parameter by a small factor for each uphill step, and decreasing by a large factor for each downhill step. The idea behind this strategy is to avoid moving downhill too fast in the beginning of optimization, therefore restricting the steps available in future iterations and therefore slowing down convergence.
 
 ## Implementation details
 
