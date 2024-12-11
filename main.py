@@ -7,9 +7,6 @@ from sklearn.preprocessing import StandardScaler
 from src.exponential_regression import ExponentialRegression
 from src.loss.chi_squared import ChiSquaredLoss
 
-def model(x: np.ndarray, *parameters) -> np.ndarray:
-    return np.exp(parameters[2] * x) * parameters[0] + np.exp(parameters[3] * x) * parameters[1]
-
 
 def main():
     measurements = 100
