@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 
 from src.exponential_regression import ExponentialRegression
-from src.loss.chi_squared import ChiSquaredLoss
+from src.loss.chi2_loss import Chi2Loss
 
 
 def main():
@@ -18,7 +18,7 @@ def main():
     scaler = StandardScaler()
     x = scaler.fit_transform(x)
 
-    loss = ChiSquaredLoss(measurements, measurement_errors)
+    loss = Chi2Loss(measurements, measurement_errors)
 
     er = ExponentialRegression(n_terms=2, loss_function=loss)
     er.fit(x, y, initial_lambda=np.array([1., -1.]), initial_omega=np.array([-1., -1.]))

@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils.validation import check_X_y, check_array
 
-from .loss import LossFunction, ChiSquaredLoss
+from .loss import LossFunction, Chi2Loss
 
 
 class ExponentialRegression(BaseEstimator, RegressorMixin):
@@ -70,7 +70,7 @@ class ExponentialRegression(BaseEstimator, RegressorMixin):
                 jacobian = self._jacobian(t)
                 gradient = self.loss_function.gradient(
                     target, y_pred, jacobian)
-                loss = self.loss_function.compute_loss(target, y_pred)
+                loss = self.loss_function.loss(target, y_pred)
 
                 if self._check_convergence(gradient, self.lambda_, self.omega_, loss, data.size):
                     break
@@ -112,8 +112,8 @@ class ExponentialRegression(BaseEstimator, RegressorMixin):
                                  self.lambda_ + delta[:self.n_terms],
                                  self.omega_ + delta[self.n_terms:])
 
-        chi_sqr = self.loss_function.compute_loss(y_true, y_pred)
-        new_chi_sqr = self.loss_function.compute_loss(y_true, new_y_pred)
+        chi_sqr = self.loss_function.loss(y_true, y_pred)
+        new_chi_sqr = self.loss_function.loss(y_true, new_y_pred)
 
         rho = (
                 (chi_sqr - new_chi_sqr) /
@@ -155,7 +155,3 @@ class ExponentialRegression(BaseEstimator, RegressorMixin):
 
         exp_terms = np.exp(np.outer(t, omega_))
         return exp_terms @ lambda_
-
-    @staticmethod
-    def _safe_exp(x: np.ndarray) -> np.ndarray:
-        return np.exp(np.clip(x, -20, 20))

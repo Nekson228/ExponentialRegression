@@ -4,7 +4,7 @@ from typing import Optional
 from .loss_function import LossFunction
 
 
-class ChiSquaredLoss(LossFunction):
+class Chi2Loss(LossFunction):
     # Chi-squared (or weighted MSE) loss function
     def __init__(self, measurements_amount: int, measurement_variance: float | np.ndarray | None = None) -> None:
         if isinstance(measurement_variance, float):
@@ -14,7 +14,7 @@ class ChiSquaredLoss(LossFunction):
         else:
             self._weights = np.eye(measurements_amount)
 
-    def compute_loss(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    def loss(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
         residuals = y_true - y_pred
         return np.float_(residuals.T @ self._weights @ residuals)
 

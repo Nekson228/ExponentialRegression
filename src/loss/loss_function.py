@@ -8,7 +8,7 @@ class LossFunction(ABC):
         return self.__class__.__name__
 
     @abstractmethod
-    def compute_loss(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    def loss(self, y_true: np.ndarray, y_pred: np.ndarray) -> float:
         """
         Compute the loss function given the residuals
         :param y_true: true values
