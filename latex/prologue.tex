@@ -1,0 +1,157 @@
+\section*{Задание\\ на курсовую работу}
+
+\setlength{\extrarowheight}{7mm}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}X}
+	Студент \student{}                                                                                                   \\
+	\group                                                                                                               \\
+	Тема работы: \theme                                                                                                  \\
+	Исходные данные: \ldots                                                                                              \\
+	Содержание пояснительной записки: содержание, введение, \ldots, заключение, список использованных источников, \ldots \\
+	Предполагаемый объём пояснительной записки: не менее 00 страниц.                                                     \\
+	Дата выдачи задания: 17.10.2024                                                                                      \\
+	Дата сдачи реферата: 14.12.2024                                                                                      \\
+\end{tabularx}
+\setlength{\extrarowheight}{0mm}
+
+\vspace{50mm}
+%\vfill
+
+\setlength{\extrarowheight}{4mm}
+\begin{tabulary}{\textwidth}{LCCCL}
+	Студент & \hspace{0.5cm} & \hspace{4.5cm} & \hspace{0.5cm} & \student \\
+	\cline{3-3}
+	Преподаватель & \hspace{0.5cm} & \hspace{4.5cm} & \hspace{0.5cm} & \teacher \\
+	\cline{3-3}
+\end{tabulary}
+\setlength{\extrarowheight}{0mm}
+
+\newpage
+
+\section*{АННОТАЦИЯ}
+\begin{minipage}[t][0.4\textheight][t]{0.9\linewidth}
+	\setlength{\parindent}{1.25cm}
+	\indent
+	Кратко (в 8--10 строк) указать основное содержание курсового проекта (курсовой работы), методы исследования (разработки), полученные результаты.
+\end{minipage}
+
+\selectlanguage{english}
+\section*{SUMMARY}
+\begin{minipage}[t][0.4\textheight][t]{0.9\linewidth}
+	\setlength{\parindent}{1.25cm}
+	\indent
+	Summary in English.
+\end{minipage}
+\selectlanguage{russian}
+
+\newpage
+
+\let \savenumberline \numberline
+\def \numberline#1{\savenumberline{#1.}}
+
+\tableofcontents
+
+\newpage
+
+\section*{Введение}
+\addcontentsline{toc}{section}{Введение}
+
+\subsection*{Цель работы.}
+
+Разработка и реализация метода аппроксимации ряда данных линейной комбинацией экспоненциальных функций с неизвестными вещественными показателями.
+
+\subsection*{Задание.}
+Даны $(t_i, y_i)_{i=1}^n$, где $t_i \in \mathbb{R}$, $y_i \in \mathbb{R}$, $i = 1, \ldots, n$.
+
+Рассмотрим $p$ — количество экспоненциальных членов, тогда мы подбираем функцию:
+$$
+	f: X \to Y; \:
+	f(t, \textbf{p}) =\sum_{i=1}^p\lambda_i\alpha_i^t
+$$
+где $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \alpha_1, \ldots, \alpha_p)$ — параметры, которые необходимо подобрать.
+
+Предполагая, что $\forall i \:\alpha_i > 0$, можно переписать $f(t, \textbf{p})$ как:
+$$
+	f(t, \textbf{p})=\sum_{i=1}^p\lambda_i\exp(\ln(\alpha_i)t) =
+	\sum_{i=1}^p\lambda_i\exp(\omega_it),
+$$
+где $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \omega_1, \ldots, \omega_p)$
+
+Функция потерь для оптимизации — это $\chi^2$, или взвешенный MSE, так как он часто используются в задачах аппроксимации кривых:
+$$
+	L(\mathbf{p}) = \chi^2(\boldsymbol p) = \sum_{i=1}^n\left(\frac{y_i-f(t_i, \boldsymbol p)}{\sigma_i}\right)^2 = \left[\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^T\boldsymbol{W}\left[\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ],
+$$
+где $\boldsymbol{W} = \operatorname{diag}\left(\frac{1}{\sigma_1^2}, \ldots, \frac{1}{\sigma_n^2}\right)$ - матрица весов: $\sigma_i^2=\mathbb{D}[y_i]$.
+
+Метод оптимизации — алгоритм Левенберга-Марквардта, встроенный во множество библиотек для оптимизации, например, в SciPy.
+
+\subsection*{Основные теоретические положения.}
+
+Подобно другим численным методам минимизации, алгоритм Левенберга-Марквардта является итеративной процедурой. Для начала минимизации необходимо задать начальное приближение для вектора параметров. Начальное значение $\textbf{p}^T=\begin{pmatrix}1, 1, \dots, 1\end{pmatrix}$ подходит в большинстве случаев; в задачах с множеством локальных минимумов алгоритм сходится к глобальному минимуму, только если начальное приближение достаточно близко к решению.
+
+На каждом шаге итерации вектор параметров $\textbf{p}$ заменяется новой оценкой $\textbf{p}+\boldsymbol{\Delta}$. Чтобы определить $\boldsymbol{\Delta}$, функция $f(t_i, \textbf{p} + \boldsymbol{\Delta})$ линеаризуется:
+$$
+	f(t_i, \textbf{p} + \boldsymbol{\Delta})\approx f(t_i, \textbf{p})+\mathbf{J}_i\boldsymbol{\Delta},
+$$
+где
+\[
+	\mathbf{J}_i = \frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{p}}
+\]
+
+— это градиент $f$ по параметрам $\mathbf{p}$.
+
+Таким образом, для текущей задачи $\forall j\le p:$
+$$
+	\mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(\omega_jt_i),
+$$
+
+$$
+	\mathbf{J}_{ij+p}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\omega_j}} = \lambda_jt_i\exp(\omega_jt_i).
+$$
+
+Функция потерь достигает минимума, когда её градиент по $\textbf{p}$ равен нулю. Для первого приближения $f\left (t_i,  \mathbf{p} + \boldsymbol\Delta\right )$:
+
+$$
+	L\left ( \mathbf{p} + \boldsymbol\Delta\right ) \approx \sum_{i=1}^n \left [\frac{y_i - f\left (t_i,  \mathbf{p}\right ) - \mathbf J_i \boldsymbol\Delta}{\sigma_i}\right ]^2
+$$
+
+или в векторной форме:
+
+$$
+	\begin{aligned}
+		L\left ( \mathbf{p} + \boldsymbol\Delta\right ) & \approx \left \|\boldsymbol{W}^{1/2}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta\right ]\right \|_2^2                                                                                                                                                                                                                                           \\
+		& = \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta \right ]^{\mathrm T}\boldsymbol{W}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta\right ]                                                                                                                                                                    \\
+		 & = \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T}\boldsymbol{W}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ] - 2\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T}\boldsymbol{W} \mathbf J\boldsymbol{\Delta} + \boldsymbol{\Delta}^{\mathrm T} \mathbf J^{\mathrm T} \boldsymbol{W} \mathbf J\boldsymbol{\Delta}.
+	\end{aligned}
+$$
+
+Взяв производную от $L\left ( \mathbf{p} + \boldsymbol\Delta\right )$ по $\boldsymbol{\Delta}$ и приравняв её к нулю, получим:
+
+$$
+	\left (\mathbf J^{\mathrm T} \boldsymbol{W} \mathbf J \right ) \boldsymbol\Delta = \mathbf J^{\mathrm T}\boldsymbol{W}\left [\mathbf y - \mathbf f\left ( \boldsymbol p\right )\right ].
+$$
+
+
+Выражение выше соответствует методу Гаусса–Ньютона. Матрица Якоби $\mathbf{J}$ обычно не квадратная, а прямоугольная размерности $m \times n$, где $n$ — количество параметров. Перемножение $\mathbf J^{\mathrm T} \boldsymbol{W} \mathbf J$ дает квадратную матрицу размерности $n \times n$. Результат — это система из $n$ линейных уравнений, решаемая для $\boldsymbol{\Delta}$.
+
+Вклад Левенберга заключается в использовании демпфированной версии уравнения:
+
+$$
+	\left (\mathbf J^{\mathrm T} \boldsymbol{W} \mathbf J + \lambda \mathbf{E} \right ) \boldsymbol\Delta = \mathbf J^{\mathrm T}\boldsymbol{W}\left [\mathbf y - \mathbf f\left ( \boldsymbol p\right )\right ].
+$$
+
+где $\lambda$ — коэффициент демпфирования, изменяемый после каждого вычисления $\boldsymbol{\Delta}$. Если снижение $L$ быстрое, значение $\lambda$ уменьшается, приближая алгоритм к методу Гаусса–Ньютона:
+
+$$
+	\boldsymbol{\Delta}\approx[\mathbf J^{\mathrm T} \boldsymbol{W} \mathbf J]^{-1}\mathbf{J}^{T}\boldsymbol{W}[\mathbf y - \mathbf f\left ( \mathbf{p}\right )],
+$$
+
+иначе $\lambda$ увеличивается, приближая шаг к направлению градиентного спуска:
+
+$$
+	\boldsymbol{\Delta}\approx\lambda^{-1}\mathbf{J}^{T}\boldsymbol{W}[\mathbf y - \mathbf f\left ( \mathbf{p}\right )].
+$$
+
+На старте алгоритма $\lambda$ обычно берется достаточно большим ($\approx 1$), чтобы делать первые шаги в направлении градиентного спуска. После каждой итерации $\lambda$ умножается или делится на определенный фактор, чтобы менять скорость сходимости. 
+Подробности см. в разделе "Выполнение работы"  подраздел "Детали реализации".
+
+\newpage

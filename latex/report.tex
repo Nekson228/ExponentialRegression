@@ -1,0 +1,284 @@
+% !TEX program = xelatex
+
+\input{preamble}
+
+\newcommand{\subject}{Дифференциальные уравнения}
+\newcommand{\theme}{Аппроксимация данных линейной комбинацией экспоненциальных функций}
+\newcommand{\teacher}{Колоницкий С.Б.}
+\newcommand{\student}{Поглазов Н.В.}
+\newcommand{\groupnumber}{2384}
+\newcommand{\group}{Группа 2384}
+
+\begin{document}
+
+\input{titlepage}
+
+\setcounter{page}{2}
+
+\input{prologue}
+
+\section{Выполнение работы}
+\subsection{Детали реализации}
+
+Так как производительность реализации, основанной исключительно на теоретических выкладках, оказалась недостаточной для практического применения, в итоговом решении были внесены несколько улучшений.
+
+\subsubsection{Предобработка данных}
+
+Для повышения численной устойчивости было принято решение стандартизировать данные перед обучением модели. Для этого используется формула:
+
+\[
+	x_i = \frac{x_i - \mu}{\sigma},
+\]
+
+то есть, после предобработки все значения признаков будут иметь нулевое среднее и единичное стандартное отклонение. Также этот метод не меняет форму распределения данных, что важно для сохранения интерпретируемости результатов.
+
+\subsubsection{Обновление параметров}
+
+Ранее, найденная $\boldsymbol{\Delta}$ применялась, если функция потерь уменьшалась, иначе она отклонялась, а коэффициент демпфирования увеличивался. Теперь шаг принимается, если метрика $\rho$ (была предложена Нильсеном в его статье 1999 года [3]) больше порогового значения $\epsilon_4 > 0$. Эта метрика измеряет фактическое уменьшение $\chi^2$ по сравнению с улучшением, достигаемым шагом метода Левенберга-Марквадта:
+
+\[
+	\begin{aligned}
+		\rho & = \frac{\chi^2(\boldsymbol p) - \chi^2(\boldsymbol p + \boldsymbol\Delta)}
+		{|(\boldsymbol{y}-\boldsymbol{\hat{y}})^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}}) - (\boldsymbol{y}-\boldsymbol{\hat{y}}-\mathbf{J}\boldsymbol{\Delta})^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}}-\mathbf{J}\boldsymbol{\Delta})|} \notag \\
+		     & =\frac{\chi^2(\boldsymbol p) - \chi^2(\boldsymbol p + \boldsymbol\Delta)}
+		{|\boldsymbol{\Delta}^T(\lambda\boldsymbol{\Delta} + \mathbf{J}^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}}))|}\notag                                                                                                                              \\
+	\end{aligned}
+\]
+
+где $\boldsymbol{\hat{y}} = \mathbf{f}(\boldsymbol{p})$.
+
+Коэффициент демпфирования и параметры модели обновляются согласно следующим правилам:
+
+Если $\rho > \epsilon_4$:
+\[
+	\lambda = \max\left[\frac{\lambda}{L_\downarrow},\:10^{-7}\right],\:\mathbf{p} \gets \mathbf{p} + \boldsymbol{\Delta}
+\]
+иначе:
+\[
+	\lambda = \min\left[\lambda L_\uparrow,\:10^{7}\right],\:\mathbf{p} \gets \mathbf{p}
+\]
+
+где $L_\downarrow\approx 9$ и $L_\uparrow\approx 11$ — фиксированные константы. Эти значения хорошо показали себя на практике и были выбраны на основе статьи [2].
+
+\subsubsection{Критерии сходимости}
+
+Алгоритм останавливается, когда выполняется \textit{одно} из следующих условий:
+
+\begin{itemize}
+	\item Сходимость по градиенту: $\operatorname{max}|\mathbf{J}^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}})| < \varepsilon_1$
+	\item Сходимость по коэффициентам: $\operatorname{max}|{\boldsymbol{\Delta}}/\mathbf{p}| < \epsilon_2$
+	\item Сходимость по (редуцированному) $\chi^2$: $\chi^2_{\nu}=\chi^2/(m-n) < \epsilon_3$
+\end{itemize}
+
+\subsection{Программная реализация алгоритма}
+
+Для реализации алгоритма был выбран язык программирования Python, так как он предоставляет широкие возможности для научных вычислений и имеет большое количество библиотек для работы с данными. В качестве основной библиотеки для работы с данными была выбрана библиотека NumPy, а для работы с графиками — Matplotlib.
+
+\subsubsection{Структура проекта}
+
+Проект разделен на следующие модули:
+
+\begin{itemize}
+	\item \texttt{exponential\_regression.py} — модуль с реализацией алгоритма в классе \texttt{ExponentialRegression}
+	\item \texttt{loss/loss\_function.py} -- модуль с реализацией базового класса для функций потерь \texttt{LossFunction}
+	\item \texttt{loss/chi2\_loss.py} -- модуль с реализацией функции потерь $\chi^2$ в классе \texttt{Chi2Loss}
+	\item \texttt{main.py} — точка входа в программу, содержит пример использования алгоритма
+\end{itemize}
+
+\subsubsection{Класс \texttt{ExponentialRegression}}
+
+Класс \texttt{ExponentialRegression} реализует регрессионную модель на основе экспоненциальных функций. Он наследует \texttt{BaseEstimator} и \texttt{RegressorMixin} из библиотеки \texttt{scikit-learn}, что делает его совместимым с её API. Основное назначение класса \texttt{ExponentialRegression}~--- обучение и предсказание на основе экспоненциальной зависимости.
+
+При создании экземпляра класса задаются следующие параметры:
+\begin{itemize}
+	\item \texttt{n\_terms} (int, по умолчанию $1$): число экспоненциальных членов в модели.
+	\item \texttt{max\_iter} (int, по умолчанию $1000$): максимальное число итераций для процедуры оптимизации.
+	\item \texttt{gradient\_tol} (float, по умолчанию $10^{-3}$): порог для остановки оптимизации по величине градиента.
+	\item \texttt{coefficients\_tol} (float, по умолчанию $10^{-3}$): порог для изменения коэффициентов модели.
+	\item \texttt{chi2\_reduced\_tol} (float, по умолчанию $0.1$): порог для среднего значения $\chi^2$.
+	\item \texttt{step\_acceptance} (float, по умолчанию $0.1$): минимальное значение отношения улучшения шага для принятия шага.
+	\item \texttt{reg\_init} (float, по умолчанию $0.1$): начальное значение регуляризации.
+	\item \texttt{loss\_function} (\texttt{LossFunction}, по умолчанию \texttt{Chi2Loss}): функция потерь, используемая для вычисления градиента, гессиана и значения ошибки.
+\end{itemize}
+
+В дополнение к параметрам инициализации, класс определяет несколько предустановленных констант, таких как коэффициенты изменения регуляризации \texttt{REG\_INCREASE\_FACTOR}, \texttt{REG\_DECREASE\_FACTOR}, а также минимальные и максимальные значения регуляризации \texttt{REG\_MIN} и \texttt{REG\_MAX}.
+
+\texttt{fit(data, target, initial\_lambda=None, \linebreak initial\_omega=None)}:
+
+Метод обучает модель на основе входных данных:
+\begin{itemize}
+	\item \texttt{data} (\texttt{np.ndarray}): одномерный массив временных значений.
+	\item \texttt{target} (\texttt{np.ndarray}): одномерный массив значений целевой переменной.
+	\item \texttt{initial\_lambda} (\texttt{Optional[np.ndarray]}): начальные значения коэффициентов , если заданы.
+	\item \texttt{initial\_omega} (\texttt{Optional[np.ndarray]}): начальные значения параметров , если заданы.
+\end{itemize}
+Для решения системы $[\mathbf{J}^T\mathbf{W}\mathbf{J}]\boldsymbol{\Delta}=\mathbf{J}^T\mathbf{W}(\mathbf{y}-\mathbf{\hat{y}})$ используется функция \linebreak \texttt{scipy.linalg.solve} из библиотеки SciPy.
+\\*
+
+\texttt{predict(data)}:
+
+Метод делает предсказания для входных данных \texttt{data}:
+\begin{itemize}
+	\item \texttt{data} (\texttt{np.ndarray}): одномерный массив временных значений.
+\end{itemize}
+
+Приватные (вспомогательные) методы:
+
+\begin{itemize}
+	\item \texttt{\_init\_parameters(n\_terms)}: инициализация параметров $\mathbf{p}$.
+	\item \texttt{\_jacobian(t)}: вычисление якобиана.
+	\item \texttt{\_regularize\_hessian(hessian)}: добавление регуляризации к гессиану.
+	\item \texttt{\_accept\_step(t, y\_true, y\_pred, delta, gradient)}: проверка, является ли шаг улучшением, и обновление параметров в случае успеха.
+	\item \texttt{\_increase\_regularization()}: увеличение параметра регуляризации.
+	\item \texttt{\_decrease\_regularization()}: уменьшение параметра регуляризации.
+	\item \texttt{\_check\_convergence(gradient, lambda\_delta, omega\_delta, loss, measurements\_amount)}: проверка условий сходимости.
+	\item \texttt{\_model(t, lambda\_=None, omega\_=None)}: вычисление $f(\mathbf{t}, \mathbf{p})$.
+\end{itemize}
+
+
+\subsubsection{Класс \texttt{Chi2Loss}}
+
+Класс \texttt{Chi2Loss} реализует функцию потерь $\chi^2$. Он наследует \linebreak \texttt{LossFunction} и реализует методы для вычисления градиента, гессиана и значения функции потерь.
+
+При создании экземпляра класса задаются следующие параметры:
+\begin{itemize}
+	\item \texttt{measurements\_amount} (\texttt{int}): количество измерений;
+	\item \texttt{measurement\_variance} (\texttt{np.ndarray | float | None},  по умолчанию \texttt{None}): дисперсия каждого измерения или общая дисперсия;
+\end{itemize}
+с помощью которых вычисляется матрица весов $\mathbf{W}$.
+\\*
+\texttt{loss(y\_true, y\_pred)}:
+
+Метод вычисляет значение функции потерь:
+\[
+	\chi^2 = \left[\mathbf y - \mathbf{\hat{y}}\right ]^T\mathbf{W}\left[\mathbf y - \mathbf{\hat{y}}\right ],
+\]
+\\*
+\texttt{gradient(t, y\_true, y\_pred, jacobian)}:
+
+Метод вычисляет (анти-) градиент функции потерь деленный на 2 (для удобства в использовании):
+\[
+	-\frac{1}{2}\frac{\partial\chi^2}{\partial\mathbf{p}} = \mathbf{J}^T\mathbf{W}(\mathbf{y}-\mathbf{\hat{y}})
+\]
+\\*
+\texttt{hessian(jacobian)}:
+
+Метод (приближенно) вычисляет гессиан функции потерь:
+
+\[
+	\frac{\partial^2\chi^2}{\partial\mathbf{p}^2} \approx \mathbf{J}^T\mathbf{W}\mathbf{J}
+\]
+
+где $\mathbf{\hat{y}}$ - \texttt{y\_pred},  $\mathbf{y}$ - \texttt{y\_true}, $\mathbf{J}$ - \texttt{jacobian}, $\mathbf{W}$ - диагональная матрица весов.
+
+
+\newpage
+\section{Демонстрация работы программы}
+\subsection{Пример с одним экспоненциальным членом}
+
+Для примера были сгенерированы данные, соответствующие зависимости $f(t)=2\exp(-0.25t) + \epsilon,\:\epsilon\in\mathcal{N}(0, 1)$ — случайный шум.
+
+Было проведено 100 замеров в диапазоне $t\in[-10, 10]$. После обучения модели были получены следующие результаты:
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.7\linewidth]{../img/ex1.png}
+	\caption{Пример с одним экспоненциальным членом}
+\end{figure}
+
+Как видно из графика, модель хорошо отфильтровала шум и восстановила исходную зависимость.
+
+\subsection{Пример с двумя экспоненциальными членами}
+
+Для примера были сгенерированы данные, соответствующие зависимости $f(t) = 2\exp(-0.25t)-5\exp(-2t)  + \epsilon,\:\epsilon\in\mathcal{N}(0, 0.1^2)$— случайный шум.
+
+Было проведено 100 замеров в диапазоне $t\in[0, 10]$. После обучения модели были получены следующие результаты:
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.7\linewidth]{../img/ex2_poor.png}
+	\caption{Пример с двумя экспоненциальными членами}
+	\label{fig:image}
+\end{figure}
+
+Как видно из графика, модель не смогла восстановить исходную зависимость. Это связано с тем, что функция потерь $\chi^2(\mathbf{p})$ может иметь множество локальных минимумов. В таких случаях метод Левенберга-Марквардта может сходиться к неудовлетворительному решению. Если это происходит, пользователь может попытаться задать лучшее начальное приближение для параметров, например, с помощью случайного поиска, или поиска по сетке, либо путем анализа данных.
+
+Попробуем улучшить результат, вручную задав начальные приближения для параметров:
+$$
+	\begin{aligned}
+		\mathbf{\lambda} & = \begin{bmatrix} 1 & -1 \end{bmatrix}  \\
+		\mathbf{\omega}  & = \begin{bmatrix} -1 & -1 \end{bmatrix}
+	\end{aligned}
+$$
+
+После обучения модели с начальными приближениями были получены следующие результаты:
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.7\linewidth]{../img/ex2_good.png}
+	\caption{Пример с двумя экспоненциальными членами (улучшенный результат)}
+\end{figure}
+
+
+Как видно из графика, модель восстановила исходную зависимость. Это показывает, что правильный выбор начальных приближений для параметров может существенно повлиять на результат.
+
+Написанный алгоритм позволяет удобно и быстро решать задачи аппроксимации данных линейной комбинацией экспоненциальных функций. Он легко расширяется на случай большего числа экспоненциальных членов, а также на случай других функций потерь.
+
+Реализованный код см. в приложении А.
+
+\newpage
+\section*{Заключение}
+\addcontentsline{toc}{section}{Заключение}
+
+В процессе выполнения работы удалось глубже изучить тему экспоненциальной регрессии, разработать её алгоритм и проверить его эффективность. Были рассмотрены различные методы оптимизации, такие как алгоритм Левенберга-Марквардта.
+
+В итоге был разработан и протестирован алгоритм, который подтвердил свою эффективность и практическую ценность. Полученные результаты открывают возможности для дальнейшей работы над улучшением методов регрессии и их применением для решения более сложных задач анализа данных.
+
+\newpage
+
+\addcontentsline{toc}{section}{Список использованных источников}
+\begin{thebibliography}{99}
+	\bibitem{wiki}
+	Wikipedia contributors.
+	\emph{Levenberg--Marquardt algorithm}.
+	Wikipedia, The Free Encyclopedia.
+	Available at: \url{https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm}.
+
+	\bibitem{gavin2020}
+	H.~P. Gavin.
+	\emph{The Levenberg-Marquardt algorithm for nonlinear least squares curve-fitting problems}.
+	2020.
+	Available at: \url{https://people.duke.edu/~hpgavin/ce281/lm.pdf}.
+
+	\bibitem{nielson1999}
+	H.~B. Nielsen.
+	\emph{Damping Parameter in Marquardt's Method}.
+	1999.
+	Available at: \url{https://www2.imm.dtu.dk/documents/ftp/tr99/tr05_99.pdf}.
+\end{thebibliography}
+
+\newcommand{\sectionset}{\centering\normalsize\normalfont\bfseries\expandafter\uppercase}
+\titleformat{\section}{\centering\normalsize\normalfont\bfseries}{}{0ex}{ПРИЛОЖЕНИЕ \thesection\\\uppercase}{}
+\begin{appendices}
+	\renewcommand{\thesection}{\Asbuk{section}}
+
+	\newpage
+	\section{Исходный код программы}
+
+	\subsection{exponential\_regression.py}
+	\lstinputlisting[language=Python]{../src/exponential_regression.py}
+
+	\newpage
+	\subsection{loss/loss\_function.py}
+	\lstinputlisting[language=Python]{../src/loss/loss_function.py}
+
+	\newpage
+	\subsection{loss/chi2\_loss.py}
+	\lstinputlisting[language=Python]{../src/loss/chi2_loss.py}
+
+	\newpage
+	\subsection{main.py}
+	\lstinputlisting[language=Python]{../main.py}
+
+\end{appendices}
+\end{document}
