@@ -9,7 +9,8 @@ f: X \to Y; \:
 f(t, \textbf{p}) =\sum_{i=1}^p\lambda_i\alpha_i^t
 $$
 
-где $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \alpha_1, \ldots, \alpha_p)$
+где $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \alpha_1, \ldots, \alpha_p)$ — параметры, которые необходимо подобрать.
+
 
 Предполагая, что $\forall i \:\alpha_i > 0$, можно переписать $f(t, \textbf{p})$ как:
 
@@ -18,7 +19,7 @@ f(t, \textbf{p})=\sum_{i=1}^p\lambda_i\exp(\ln(\alpha_i)t) =
 \sum_{i=1}^p\lambda_i\exp(\omega_it),
 $$
 
-где $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \omega_1, \ldots, \omega_p)$ — параметры, которые необходимо подобрать.
+где $\textbf{p} = (\lambda_1, \ldots, \lambda_p, \omega_1, \ldots, \omega_p)$
 
 Функция потерь для оптимизации — это MSE:
 
@@ -46,7 +47,7 @@ $$
 
 — это градиент $f$ по параметрам $\mathbf{p}$.
 
-Таким образом $\forall j\le p:$
+Таким образом, для текущей задачи $\forall j\le p:$
 
 $$
 \mathbf{J}_{ij}=\frac{\partial f\left (t_i,  \mathbf{p}\right )}{\partial  \mathbf{\lambda_j}} = \exp(\omega_jt_i),
@@ -65,10 +66,15 @@ $$
 или в векторной форме:
 
 $$
-L\left ( \mathbf{p} + \boldsymbol\Delta\right ) \approx \|\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta\|_2^2.
+\begin{align}
+ L\left ( \mathbf{p} + \boldsymbol\Delta\right ) &\approx \left \|\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta\right \|_2^2\notag\\
+  &= \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta \right ]^{\mathrm T}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta\right ]\notag\\
+  &= \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ] - \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T} \mathbf J \boldsymbol\Delta - \left (\mathbf J \boldsymbol\Delta\right )^{\mathrm T} \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ] + \boldsymbol\Delta^{\mathrm T} \mathbf J^{\mathrm T} \mathbf J \boldsymbol\Delta\notag\\
+  &= \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ] - 2\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T} \mathbf J \boldsymbol\Delta + \boldsymbol\Delta^{\mathrm T} \mathbf J^{\mathrm T} \mathbf J\boldsymbol\Delta.\notag
+\end{align}
 $$
 
-Взяв производную от $L\left ( \mathbf{p} + \boldsymbol\Delta\right )$ по $\Delta$ и приравняв её к нулю, получим:
+Взяв производную от $L\left ( \mathbf{p} + \boldsymbol\Delta\right )$ по $\mathbf{\Delta}$ и приравняв её к нулю, получим:
 
 $$
 \left (\mathbf J^{\mathrm T} \mathbf J\right )\boldsymbol\Delta = \mathbf J^{\mathrm T}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ].
@@ -154,9 +160,9 @@ $$
 
 Алгоритм останавливается, когда выполняется *одно* из следующих условий:
 
-- Сходимость по норме градиента: $\operatorname{max}|\mathbf{J}^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}})| < \epsilon_1$ (`gradient_tol` в коде)
-- Сходимость по коэффициентам: $\operatorname{max}|{\mathbf{\Delta}}/\mathbf{p}| < \epsilon_2$ (`coefficients_tol` в коде)
-- Сходимость по (редуцированному) $\chi^2$: $\chi^2_{\nu}=\chi^2/(m-n) < \epsilon_3$ (`chi2_red_tol` в коде)
+- Сходимость по градиенту: $\operatorname{max}|\mathbf{J}^T\mathbf{W}(\boldsymbol{y}-\boldsymbol{\hat{y}})| < \varepsilon_1$ (`gradient_tol`)
+- Сходимость по коэффициентам: $\operatorname{max}|{\mathbf{\Delta}}/\mathbf{p}| < \epsilon_2$ (`coefficients_tol`)
+- Сходимость по (редуцированному) $\chi^2$: $\chi^2_{\nu}=\chi^2/(m-n) < \epsilon_3$ (`chi2_red_tol`)
 
 где $\epsilon_1 = 10^{-3}$, $\epsilon_2 = 10^{-3}$, $\epsilon_3 = 10^{-1}$ — пороговые значения, заданные пользователем.
 
