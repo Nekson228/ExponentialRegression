@@ -5,7 +5,8 @@
 \newcommand{\subject}{Дифференциальные уравнения}
 \newcommand{\theme}{Аппроксимация данных линейной комбинацией экспоненциальных функций}
 \newcommand{\teacher}{Колоницкий С.Б.}
-\newcommand{\student}{Поглазов Н.В.}
+\newcommand{\studentn}{Поглазов Н.В.}
+\newcommand{\studentr}{Цыганков Р.М}
 \newcommand{\groupnumber}{2384}
 \newcommand{\group}{Группа 2384}
 
@@ -97,11 +98,11 @@
 	\item \texttt{coefficients\_tol} (float, по умолчанию $10^{-3}$): порог для изменения коэффициентов модели.
 	\item \texttt{chi2\_reduced\_tol} (float, по умолчанию $0.1$): порог для среднего значения $\chi^2$.
 	\item \texttt{step\_acceptance} (float, по умолчанию $0.1$): минимальное значение отношения улучшения шага для принятия шага.
-	\item \texttt{reg\_init} (float, по умолчанию $0.1$): начальное значение регуляризации.
+	\item \texttt{reg\_init} (float, по умолчанию $0.1$): начальное значение $\lambda$.
 	\item \texttt{loss\_function} (\texttt{LossFunction}, по умолчанию \texttt{Chi2Loss}): функция потерь, используемая для вычисления градиента, гессиана и значения ошибки.
 \end{itemize}
 
-В дополнение к параметрам инициализации, класс определяет несколько предустановленных констант, таких как коэффициенты изменения регуляризации \texttt{REG\_INCREASE\_FACTOR}, \texttt{REG\_DECREASE\_FACTOR}, а также минимальные и максимальные значения регуляризации \texttt{REG\_MIN} и \texttt{REG\_MAX}.
+В дополнение к параметрам инициализации, класс определяет несколько предустановленных констант, $L\uparrow$ -- \texttt{REG\_INCREASE\_FACTOR}, \linebreak $L\downarrow$ -- \texttt{REG\_DECREASE\_FACTOR}, а также нижняя и верхняя граница $\lambda$ -- \texttt{REG\_MIN} и \texttt{REG\_MAX}.
 
 \texttt{fit(data, target, initial\_lambda=None, \linebreak initial\_omega=None)}:
 
@@ -127,10 +128,10 @@
 \begin{itemize}
 	\item \texttt{\_init\_parameters(n\_terms)}: инициализация параметров $\mathbf{p}$.
 	\item \texttt{\_jacobian(t)}: вычисление якобиана.
-	\item \texttt{\_regularize\_hessian(hessian)}: добавление регуляризации к гессиану.
+	\item \texttt{\_regularize\_hessian(hessian)}: демпфирование гессиана.
 	\item \texttt{\_accept\_step(t, y\_true, y\_pred, delta, gradient)}: проверка, является ли шаг улучшением, и обновление параметров в случае успеха.
-	\item \texttt{\_increase\_regularization()}: увеличение параметра регуляризации.
-	\item \texttt{\_decrease\_regularization()}: уменьшение параметра регуляризации.
+	\item \texttt{\_increase\_regularization()}: увеличение $\lambda$.
+	\item \texttt{\_decrease\_regularization()}: уменьшение $\lambda$.
 	\item \texttt{\_check\_convergence(gradient, lambda\_delta, omega\_delta, loss, measurements\_amount)}: проверка условий сходимости.
 	\item \texttt{\_model(t, lambda\_=None, omega\_=None)}: вычисление $f(\mathbf{t}, \mathbf{p})$.
 \end{itemize}
@@ -206,12 +207,12 @@
 Попробуем улучшить результат, вручную задав начальные приближения для параметров:
 $$
 	\begin{aligned}
-		\mathbf{\lambda} & = \begin{bmatrix} 1 & -1 \end{bmatrix}  \\
-		\mathbf{\omega}  & = \begin{bmatrix} -1 & -1 \end{bmatrix}
+		\boldsymbol{\lambda} & = \begin{bmatrix} 1 & -1 \end{bmatrix}  \\
+		\boldsymbol{\omega}  & = \begin{bmatrix} -1 & -1 \end{bmatrix}
 	\end{aligned}
 $$
 
-После обучения модели с начальными приближениями были получены следующие результаты:
+После обучения модели с новыми начальными приближениями были получены следующие результаты:
 
 \begin{figure}[h!]
 	\centering
@@ -232,7 +233,7 @@ $$
 
 В процессе выполнения курсовой работы была достигнута цель, заключающаяся в разработке метода аппроксимации данных линейной комбинацией экспоненциальных функций с использованием алгоритма Левенберга-Марквардта. Были детально изучены основные математические принципы алгоритма, включая оптимизационные подходы, такие как градиентный спуск и метод Гаусса–Ньютона, а также особенности их сочетания в демпфированном виде.
 
-Важным этапом стало внедрение методов повышения численной устойчивости, включая стандартизацию данных и адаптивное управление коэффициентом регуляризации. Реализованная модель продемонстрировала свою эффективность на тестовых данных, успешно аппроксимируя зависимости с одним и двумя экспоненциальными членами. Тем не менее, результаты также выявили чувствительность метода к выбору начальных приближений параметров, что требует дополнительного внимания при его применении.
+Важным этапом стало внедрение методов повышения численной устойчивости, включая стандартизацию данных и адаптивное управление коэффициентом демпфирования. Реализованная модель продемонстрировала свою эффективность на тестовых данных, успешно аппроксимируя зависимости с одним и двумя экспоненциальными членами. Тем не менее, результаты также выявили чувствительность метода к выбору начальных приближений параметров, что требует дополнительного внимания при его применении.
 
 Практическая реализация была выполнена на языке программирования Python с использованием современных библиотек для численных вычислений и визуализации. Предложенный подход может быть расширен для решения более сложных задач, например, с увеличением числа экспоненциальных членов или использованием других функций потерь. Разработанный алгоритм и полученные результаты подчеркивают его потенциал для дальнейших исследований и применения в задачах анализа данных.
 
@@ -243,20 +244,20 @@ $$
 	\bibitem{wiki}
 	Wikipedia contributors.
 	\emph{Levenberg--Marquardt algorithm}.
-	Wikipedia, The Free Encyclopedia.
-	Available at: \url{https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm}.
+	Wikipedia, The Free Encyclopedia. 
+	\url{https://en.wikipedia.org/wiki/Levenberg%E2%80%93Marquardt_algorithm}.
 
 	\bibitem{gavin2020}
 	H.~P. Gavin.
 	\emph{The Levenberg-Marquardt algorithm for nonlinear least squares curve-fitting problems}.
-	2020.
-	Available at: \url{https://people.duke.edu/~hpgavin/ce281/lm.pdf}.
+	2020. 
+	\url{https://people.duke.edu/~hpgavin/ce281/lm.pdf}.
 
 	\bibitem{nielson1999}
 	H.~B. Nielsen.
 	\emph{Damping Parameter in Marquardt's Method}.
 	1999.
-	Available at: \url{https://www2.imm.dtu.dk/documents/ftp/tr99/tr05_99.pdf}.
+	\url{https://www2.imm.dtu.dk/documents/ftp/tr99/tr05_99.pdf}.
 \end{thebibliography}
 
 \newcommand{\sectionset}{\centering\normalsize\normalfont\bfseries\expandafter\uppercase}

@@ -2,14 +2,12 @@
 
 \setlength{\extrarowheight}{7mm}
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}X}
-	Студент \student{}                                                                                                   \\
-	\group                                                                                                               \\
-	Тема работы: \theme                                                                                                  \\
-	Исходные данные: \ldots                                                                                              \\
-	Содержание пояснительной записки: содержание, введение, \ldots, заключение, список использованных источников, \ldots \\
-	Предполагаемый объём пояснительной записки: не менее 00 страниц.                                                     \\
-	Дата выдачи задания: 17.10.2024                                                                                      \\
-	Дата сдачи реферата: 14.12.2024                                                                                      \\
+	Студент \studentn{} \studentr{}                                  \\
+	\group                                                           \\
+	Тема работы: \theme                                              \\
+	Предполагаемый объём пояснительной записки: не менее 15 страниц. \\
+	Дата выдачи задания: 17.10.2024                                  \\
+	Дата сдачи реферата: 14.12.2024                                  \\
 \end{tabularx}
 \setlength{\extrarowheight}{0mm}
 
@@ -18,7 +16,9 @@
 
 \setlength{\extrarowheight}{4mm}
 \begin{tabulary}{\textwidth}{LCCCL}
-	Студент & \hspace{0.5cm} & \hspace{4.5cm} & \hspace{0.5cm} & \student \\
+	Студент & \hspace{0.5cm} & \hspace{4.5cm} & \hspace{0.5cm} & \studentn \\
+	\cline{3-3}
+	Студент & \hspace{0.5cm} & \hspace{4.5cm} & \hspace{0.5cm} & \studentr \\
 	\cline{3-3}
 	Преподаватель & \hspace{0.5cm} & \hspace{4.5cm} & \hspace{0.5cm} & \teacher \\
 	\cline{3-3}
@@ -118,9 +118,8 @@ $$
 
 $$
 	\begin{aligned}
-		L\left ( \mathbf{p} + \boldsymbol\Delta\right ) & \approx \left \|\boldsymbol{W}^{1/2}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta\right ]\right \|_2^2                                                                                                                                                                                                                                           \\
-		& = \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta \right ]^{\mathrm T}\boldsymbol{W}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta\right ]                                                                                                                                                                    \\
-		 & = \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T}\boldsymbol{W}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ] - 2\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T}\boldsymbol{W} \mathbf J\boldsymbol{\Delta} + \boldsymbol{\Delta}^{\mathrm T} \mathbf J^{\mathrm T} \boldsymbol{W} \mathbf J\boldsymbol{\Delta}.
+		L\left ( \mathbf{p} + \boldsymbol\Delta\right ) & \approx \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta \right ]^{\mathrm T}\boldsymbol{W}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right ) - \mathbf J\boldsymbol\Delta\right ]                                                                                                                                                              \\
+		                                                & = \left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T}\boldsymbol{W}\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ] - 2\left [\mathbf y - \mathbf f\left ( \mathbf{p}\right )\right ]^{\mathrm T}\boldsymbol{W} \mathbf J\boldsymbol{\Delta} + \boldsymbol{\Delta}^{\mathrm T} \mathbf J^{\mathrm T} \boldsymbol{W} \mathbf J\boldsymbol{\Delta}.
 	\end{aligned}
 $$
 
@@ -151,7 +150,7 @@ $$
 	\boldsymbol{\Delta}\approx\lambda^{-1}\mathbf{J}^{T}\boldsymbol{W}[\mathbf y - \mathbf f\left ( \mathbf{p}\right )].
 $$
 
-На старте алгоритма $\lambda$ обычно берется достаточно большим ($\approx 1$), чтобы делать первые шаги в направлении градиентного спуска. После каждой итерации $\lambda$ умножается или делится на определенный фактор, чтобы менять скорость сходимости. 
+На старте алгоритма $\lambda$ обычно берется достаточно большим ($\approx 1$), чтобы делать первые шаги в направлении градиентного спуска. После каждой итерации $\lambda$ умножается или делится на определенный фактор, чтобы менять скорость сходимости.
 Подробности см. в разделе "Выполнение работы"  подраздел "Детали реализации".
 
 \newpage
