@@ -176,6 +176,13 @@
 
 где $\mathbf{\hat{y}}$ - \texttt{y\_pred},  $\mathbf{y}$ - \texttt{y\_true}, $\mathbf{J}$ - \texttt{jacobian}, $\mathbf{W}$ - диагональная матрица весов.
 
+Реализованный код см. в приложении А, по ссылке: \url{https://github.com/Nekson228/ExponentialRegression/tree/main}, или по QR-коду:
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[width=0.2\linewidth]{../img/qr.png}
+\end{figure}
+
 
 \newpage
 \section{Демонстрация работы программы}
@@ -228,13 +235,6 @@ $$
 Как видно из графика, модель восстановила исходную зависимость. Это показывает, что правильный выбор начальных приближений для параметров может существенно повлиять на результат.
 
 Написанный алгоритм позволяет удобно и быстро решать задачи аппроксимации данных линейной комбинацией экспоненциальных функций. Он легко расширяется на случай большего числа экспоненциальных членов, а также на случай других функций потерь.
-
-Реализованный код см. в приложении А, по ссылке: \url{https://github.com/Nekson228/ExponentialRegression/tree/main}, или по QR-коду:
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[width=0.2\linewidth]{../img/qr.png}
-\end{figure}
 
 \subsection{Примеры с не экспоненциальными зависимостями}
 
