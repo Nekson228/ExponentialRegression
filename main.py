@@ -20,8 +20,9 @@ def main():
 
     loss = Chi2Loss(measurements, measurement_errors)
 
-    er = ExponentialRegression(n_terms=2, loss_function=loss)
-    er.fit(x, y, initial_lambda=np.array([1., -1.]), initial_omega=np.array([-1., -1.]))
+    er = ExponentialRegression(n_terms=2, loss_function=loss,
+                               initial_lambda=np.array([1., -1.]), initial_omega=np.array([-1., -1.]))
+    er.fit(x, y)
     coefficients = np.hstack((er.lambda_, er.omega_))
     print(coefficients)
 
