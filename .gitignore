@@ -1,7 +1,7 @@
 .idea
 **/__pycache__
 .mypy_cache
-latex/*
-!latex/report.pdf
-!latex/*.tex
+docs/*
+!docs/report.pdf
+!docs/*.tex
 
