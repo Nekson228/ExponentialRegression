@@ -1,3 +1,7 @@
+ETU 2024 CompMath exponential sum fitting implementation
+
+---
+
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
@@ -23,8 +27,6 @@
 2. Run `main.py` or go through the notebook `demo.ipynb` to see the example of usage.
 
 # Problem
-
-ETU 2024 CompMath exponential sum fitting implementation
 
 Given $(t_i, y_i)_{i=1}^n$, where $X$ is 1-dimensional values and $Y$ is 1-dimensional target.
 
